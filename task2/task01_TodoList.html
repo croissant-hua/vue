@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vue-TodoList功能开发</title>
+    <script src="vue.js"></script>
+</head>
+
+<body>
+    <!-- TodoList功能开发 -->
+    <!-- 将输入框input中输入的内容显示在ul的li标签中 -->
+    <div id="root">
+        <div>
+            <input v-model="inputValue" />
+            <button @click="handleSubmit">提交</button>
+        </div>
+        <ul>
+            <!-- <li v-for="(item,index) of list" :key="index">{{item}}</li> -->
+
+            <!-- 大组件（vue实例）的模板中使用小组件todo-item ，所以把大组件称为父组件，小组件称为子组件-->
+            <!-- TodoList组件拆分 -->
+            <!-- 例如：当li标签随着增加越来越庞大，就可以拆分成一个组件 -->
+            <!-- 直接使用新创建的组件 -->
+            <!-- 调用todo-item可以进行传参 传递了content属性，它的值为每次循环的内容-->
+
+            <!-- 父组件通过 属性content 向子组件传值 -->
+
+            <!-- 要想删除组件，需要传递一个参数，当前子组件在列表中的下标index -->
+            <!-- 父组件在模板中创建子组件时，同时可以 监听子组件向外触发的delete事件, 若父组件监听到了子组件的delete事件，执行handleDelete函数 -->
+            <todo-item v-for="(item,index) of list" :key="index" :content="item" :index="index" @delete="handleDelete"></todo-item>
+        </ul>
+    </div>
+
+
+    <script>
+        //创建组件的方法 ,创建名为todo-item的组件
+        // Vue.component定义的组件，是全局组件
+        //全局组件更简单
+        //将li标签拆成小的组件，进行单独管理
+        //每个组件又是一个vue实例
+
+        //父子组件进行交互，父组件通过 属性content 向子组件传值   子组件通过发布的一种模式发布事件 父组件订阅该事件，向父组件传值
+        Vue.component('todo-item', {
+            props: ['content', 'index'], //todo-item组件 接收一个从外部传递进来的名字为content的属性,多接收一个下标参数
+            template: '<li @click="handleClick">{{content}}{{index}}</li>',
+            methods: {
+                handleClick: function() { //实现子组件的删除  由父组件的list传递过来，要想删除子组件，应该将父组件中渲染子组件的数据删除
+                    //实现子组件和父组件的通信 ，通过一个发布订阅模式
+                    //子组件向外部进行一个发布
+                    this.$emit('delete', this.index)
+                }
+            }
+        })
+
+
+        //局部组件  父组件不能调用子组件，例如：全局组件todo-item不能调局部组件TodoItem
+        //若想在其他vue实例中使用该局部组件，需要组件声明components
+        // var TodoItem = {
+        //     template: '<li></li>'
+        // }
+
+
+        //vue实例与组件的关系：每一个vue的组件，又是vue的实例，例如：todo-item既是组件，又是vue实例
+        //任何vue项目都是由千千万万个vue实例组成的，
+
+
+        new Vue({
+            el: "#root",
+            // components: { //做组件声明 若想调用局部组件，必须进行组件声明
+            //     'todo-item': TodoItem
+            // },
+            data: {
+                inputValue: '', //双向绑定
+                list: []
+            },
+            // template: '',   若不定义模板，会把挂载点下面的所有DOM标签当做模板
+            methods: {
+                handleSubmit: function() {
+                    this.list.push(this.inputValue)
+                    this.inputValue = ''
+                },
+                handleDelete: function(index) {
+                    alert(index)
+                    this.list.splice(index, 1)
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

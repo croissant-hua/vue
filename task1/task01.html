@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vue入门</title>
+    <!-- 引入vue.js库 -->
+    <script src="vue.js"></script>
+</head>
+
+<body>
+    <div>Hello World</div>
+
+    <!-- 挂载点，模板，实例之间的关系 -->
+    <div id="app">
+        <!-- <h1>hello {{ message }}</h1> -->
+    </div>
+    <!-- div标签就是vue实例的挂载点,vue只处理挂载点包含的内容 -->
+    <!-- 挂载点内部的内容，就叫做模板内容,例：<h1> -->
+
+
+    <!-- 数据、事件、方法 -->
+    <div id="root">
+        <!-- <h1 v-text="number"></h1> -->
+        <div v-text="content"></div>
+        <div v-html="content"></div>
+        <!-- <div v-on:click="()=>{alert(123)}">{{content1}}</div>有问题 -->
+        <div v-on:click="this.handleClick">{{content1}}</div>
+        <div @click="this.handleClick">{{content1}}</div>
+    </div><br /><br />
+    <!-- 插值表达式：{{ msg }} -->
+    <!-- v-text:是一个指令，表示h1要显示内容number,会对<h1>进行转义输出-->
+    <!-- v-html:是一个模板指令，写在模板标签中 ，不会对<h1>转义-->
+    <!-- v-on:新的模板指令，绑定click事件,点击执行后面的箭头函数,点击出现问题 -->
+    <!-- "v-on:"可简写成"@" -->
+
+
+    <!-- 属性的绑定和双向数据绑定 -->
+    <div id="bind">
+        <div title="this is hello world">hello world</div>
+        <div v-bind:title="'dell lee'+title">hello world</div>
+        <div :title="title">hello world</div>
+
+        <input :value="content" />
+        <input v-model="content" />
+        <div>{{content}}</div>
+    </div><br /><br />
+    <!-- title:鼠标放在标签上显示的内容，若想改变字体大小，可在data中定义-->
+    <!-- v-bind:title属性绑定的是data数据项中的title属性 -->
+    <!-- v-bind:title="title"中的"title"是js的表达式 -->
+    <!-- "v-bind:属性绑定"可以缩写为":" -->
+
+    <!-- 单向绑定：数据data可以决定页面显示内容，页面无法改变data内容 -->
+    <!-- v-model：数据双向绑定模板指令 -->
+
+
+    <!-- 计算属性与侦听器 -->
+    <div id="compute">
+        姓：<input v-model="firstName" /> 名：
+        <input v-model="lastName" />
+        <!-- <div>{{firstName}}{{lastName}}</div> 冗余,用fullName替换 -->
+        <div>{{fullName}}</div>
+
+        <div>{{count}}</div>
+    </div><br /><br />
+
+
+    <!-- vue中常见的三个指令：v-if/v-show/v-for -->
+    <div id="order">
+        <div>hello world!!!</div>
+        <!-- 若show为true则显示，若为false则不显示 -->
+        <div v-if="show">v-if:hello world!!!</div>
+        <div v-show="show">v-show:hello world!!!</div>
+        <button @click="handleClick">toggle</button>
+
+        <!-- 循环展示数组数值到ul的li中，循环list数据项，将每一次循环项的内容存入item中-->
+        <ul>
+            <li v-for="item of list" :key="item">{{item}}</li>
+            <li v-for="(item,index) of list" :key="index">{{item}}</li>
+        </ul>
+    </div>
+    <!-- v-if:直接将标签从DOM树上清除，v-show:没有将标签从DOM树上清除，只是把display设置为none.
+        若总是进行显示隐藏，用v-show更好，不会销毁DOM再创建DOM ，若只进行一次，用v-if更好-->
+    <!-- v-for:做循环内容的展示; :key会提升每次渲染的效率,每次循环key值都要不同 -->
+    <!-- 当item中存在值一样时，加一项index ，即：list每次循环的内容放入item，每项的下标放入index ，可用index作为key值-->
+    <!-- 若对list列表做频繁变更，比如排序，用index作为key会出现问题 -->
+
+
+
+
+    <script>
+        var app = new Vue({
+            // 创建Vue实例,可传递参数
+            //el代表vue实例接管哪个元素（Element）
+            //el代表vue实例和对应ID的DOM结点绑定
+            el: '#app', //挂载点 id="app"的标签
+            template: '<h1>hello {{ message }}</h1>', //模板内容
+            data: {
+                message: ' Vue!'
+            }
+        })
+
+        new Vue({
+            el: "#root",
+            data: {
+                msg: "world!",
+                number: 123,
+                content: "<h1>hello</h1>",
+                content1: "bindbind"
+            },
+            methods: { //methods属性：定义函数/方法
+                //定义handleClick方法
+                handleClick: function() {
+                    alert(123);
+                    this.content1 = "dingdingding";
+                }
+            }
+        })
+
+        new Vue({
+            el: "#bind",
+            data: {
+                title: "this is hello hello world",
+                content: "this is content"
+            }
+        })
+
+        new Vue({
+            el: "#compute",
+            data: {
+                firstName: '',
+                lastName: '',
+                count: 0
+            },
+            //和reselect库类似
+            //computed属性指：一个属性由其他属性项计算而来的结果，例：fullName由firstName+lastName得到
+            //好处：若firstName和lastName都未改变，重新使用fullName，它会使用上一次缓存的结果，不会重新计算
+            computed: {
+                fullName: function() {
+                    return this.firstName + ' ' + this.lastName
+                }
+            },
+            //侦听器 
+            watch: {
+                //监听firstName，lastName是否发生改变
+                // firstName: function() {
+                //     this.count++
+                // },
+                // lastName: function() {
+                //     this.count++
+                // },
+                //可以监听fullName,更方便
+                fullName: function() {
+                    this.count++
+                }
+            }
+        })
+
+        new Vue({
+            el: "#order",
+            data: {
+                show: true,
+                //定义一个数组，希望数组的值在页面上循环展示，展示到ul中
+                list: [1, 2, 3]
+            },
+            methods: {
+                handleClick: function() {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
